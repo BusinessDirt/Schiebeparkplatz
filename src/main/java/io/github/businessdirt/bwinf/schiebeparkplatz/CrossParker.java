@@ -29,6 +29,22 @@ public class CrossParker {
         parkingLot.set(this.x + 1, this.character);
     }
 
+    public static CrossParker getByCharacter(List<CrossParker> crossParkers, char character) {
+        CrossParker result = null;
+        for (CrossParker crossParker : crossParkers) {
+            if (crossParker.getCharacter() == character) result = crossParker;
+        }
+        return result;
+    }
+
+    public static CrossParker getByX(List<CrossParker> crossParkers, int x) {
+        CrossParker result = null;
+        for (CrossParker crossParker : crossParkers) {
+            if (crossParker.getX() == x) result = crossParker;
+        }
+        return result;
+    }
+
     public int getX() {
         return x;
     }

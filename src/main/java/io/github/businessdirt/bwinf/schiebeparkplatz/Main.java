@@ -14,10 +14,9 @@ public class Main {
     public static List<String> inputLines;
     public static FileHandler fileHandler = FileHandler.get();
 
-    public static List<Character> parkingLot;
+    public static List<Character> parkingLot = new ArrayList<>();
     public static List<CrossParker> crossParkers = new ArrayList<>();
 
-    public static int crossParker;
     public static int parkingSpaces;
 
     public static void main(String[] args) {
@@ -44,36 +43,62 @@ public class Main {
         // Gets the first line of the file and removes it
         // Splits it at the regex " "
         // Gets the second value of it and puts it into lower case
-        // Subtracts 96 from that character to get the length (ASCII Table)
+        // Subtracts 96 from that character to get the length (see ASCII Table)
         parkingSpaces = inputLines.remove(0).trim().split(" ")[1].toLowerCase().charAt(0) - 96;
-
-        // Gets the second line (now first) of the file and removes it
-        crossParker = Integer.parseInt(inputLines.remove(0));
+        inputLines.remove(0);
 
         // Gets all the data for the cross-parker
         crossParkers.clear();
         crossParkers.addAll(CrossParker.getAllFromData(inputLines));
 
-        output();
-    }
-
-    /**
-     * @return a list of the cross parked cars and EMPTY_SLOT_CHAR's if there is no cross-parked car at that spot
-     */
-    public static List<Character> getListWithCars() {
-        // Creates an empty List for all the parking spaces
-        List<Character> parkingLot = new ArrayList<>();
-        // List for the crossParkerData
         // Adds an empty slot for every parking space
         for (int i = 0; i < parkingSpaces; i++) {
             parkingLot.add(EMPTY_SLOT_CHAR);
         }
-
         // Inserts all cross parker into the list
         for (CrossParker crossParker : crossParkers) {
             crossParker.putIntoList(parkingLot);
         }
-        return parkingLot;
+
+        // loops through all the parking spaces
+        for (int i = 0; i < parkingSpaces; i++) {
+            if (parkingLot.get(i) == EMPTY_SLOT_CHAR) {
+                // Prints out the capital letter (see ASCII table, 65 is 'A' in ASCII, 65 + 1 is 'B', ...)
+                System.out.print((char) (i + 65) + ": -");
+            } else {
+                // maps for the moves
+                Map<Character, Integer> leftMoves = generateMoves(Direction.LEFT, i);
+                Map<Character, Integer> rightMoves = generateMoves(Direction.RIGHT, i);
+
+                // Prints out the capital letter (see ASCII table, 65 is 'A' in ASCII, 65 + 1 is 'B', ...)
+                System.out.print((char) (i + 65) + ": ");
+
+                if (leftMoves == null && rightMoves == null) {
+                    System.out.print("Car can't get out");
+                } else if (rightMoves == null && leftMoves != null) {
+                    printMap(leftMoves, Direction.LEFT);
+                } else if (leftMoves == null && rightMoves != null) {
+                    printMap(rightMoves, Direction.RIGHT);
+                } else {
+                    int tempLeft = 0;
+                    for (Integer integer : leftMoves.values()) {
+                        tempLeft += integer;
+                    }
+
+                    int tempRight = 0;
+                    for (Integer integer : rightMoves.values()) {
+                        tempRight += integer;
+                    }
+
+                    if (tempLeft < tempRight) {
+                        printMap(leftMoves, Direction.LEFT);
+                    } else {
+                        printMap(rightMoves, Direction.RIGHT);
+                    }
+                }
+            }
+            System.out.print("\n");
+        }
     }
 
     /**
@@ -135,61 +160,11 @@ public class Main {
     /**
      * Prints out the map with the direction and car character
      * @param moves the map to be printed
-     * @param dir the direction
+     * @param direction the direction
      */
-    public static void printMap(Map<Character, Integer> moves, Direction dir) {
-        String direction = dir == Direction.LEFT ? "left" : "right";
+    public static void printMap(Map<Character, Integer> moves, Direction direction) {
         for (Map.Entry<Character, Integer> move : moves.entrySet()) {
-            System.out.print(move.getKey().toString().toUpperCase() + " " + move.getValue() + " " + direction + " ");
-        }
-    }
-
-    /**
-     * Generates the output
-     */
-    public static void output(){
-        // sets up the cross parkers
-        parkingLot = getListWithCars();
-
-        // loops through all the parking spaces
-        for (int i = 0; i < parkingSpaces; i++) {
-
-            if (parkingLot.get(i) == EMPTY_SLOT_CHAR) {
-                // Prints out the capital letter (see ASCII table, 65 is 'A' in ASCII, 65 + 1 is 'B', ...)
-                System.out.print((char) (i + 65) + ": -");
-            } else {
-                // maps for the moves
-                Map<Character, Integer> leftMoves = generateMoves(Direction.LEFT, i);
-                Map<Character, Integer> rightMoves = generateMoves(Direction.RIGHT, i);
-
-                // Prints out the capital letter (see ASCII table, 65 is 'A' in ASCII, 65 + 1 is 'B', ...)
-                System.out.print((char) (i + 65) + ": ");
-
-                if (leftMoves == null && rightMoves == null) {
-                    System.out.print("Car can't get out");
-                } else if (rightMoves == null && leftMoves != null) {
-                    printMap(leftMoves, Direction.LEFT);
-                } else if (leftMoves == null && rightMoves != null) {
-                    printMap(rightMoves, Direction.RIGHT);
-                } else {
-                    int tempLeft = 0;
-                    for (Integer integer : leftMoves.values()) {
-                        tempLeft += integer;
-                    }
-
-                    int tempRight = 0;
-                    for (Integer integer : rightMoves.values()) {
-                        tempRight += integer;
-                    }
-
-                    if (tempLeft < tempRight) {
-                        printMap(leftMoves, Direction.LEFT);
-                    } else {
-                        printMap(rightMoves, Direction.RIGHT);
-                    }
-                }
-            }
-            System.out.print("\n");
+            System.out.print(move.getKey().toString().toUpperCase() + " " + move.getValue() + " " + direction.toString() + " ");
         }
     }
 }
