@@ -35,6 +35,9 @@ public class Main {
     private static void calculate(String fileName) {
         System.out.println("\nCalculating " + fileName.substring(0, fileName.length() - 4) + ":");
 
+        // Sets the start of the timer
+        long startTime = System.nanoTime();
+
         // Parses the content of the file into a list
         // every String in the List is a separate line in the file
         inputStream = fileHandler.getFileFromResourceAsStream(fileName);
@@ -51,6 +54,7 @@ public class Main {
         crossParkers.clear();
         crossParkers.addAll(CrossParker.getAllFromData(inputLines));
 
+        parkingLot.clear();
         // Adds an empty slot for every parking space
         for (int i = 0; i < parkingSpaces; i++) {
             parkingLot.add(EMPTY_SLOT_CHAR);
@@ -99,6 +103,8 @@ public class Main {
             }
             System.out.print("\n");
         }
+        long endTime = System.nanoTime();
+        System.out.println("Took " + ((endTime - startTime) / 1000000) + "ms");
     }
 
     /**
@@ -117,10 +123,10 @@ public class Main {
 
                 // move the car
                 if (dir == Direction.LEFT) {
-                    row.set(row.lastIndexOf(currentCharacter), '-');
+                    row.set(row.lastIndexOf(currentCharacter), EMPTY_SLOT_CHAR);
                     row.set(row.indexOf(currentCharacter) - 1, currentCharacter);
                 } else if (dir == Direction.RIGHT) {
-                    row.set(row.indexOf(currentCharacter), '-');
+                    row.set(row.indexOf(currentCharacter), EMPTY_SLOT_CHAR);
                     row.set(row.indexOf(currentCharacter) + 1, currentCharacter);
                 }
 
